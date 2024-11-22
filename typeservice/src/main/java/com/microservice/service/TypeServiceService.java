@@ -11,6 +11,7 @@ import com.microservice.repository.TypeServiceRepository;
 
 @Service
 public class TypeServiceService implements InTypeService {
+    @Autowired
     TypeServiceRepository tsr = new TypeServiceRepository();
     @Override
     public void registerTypeService(TypeService typeService) {

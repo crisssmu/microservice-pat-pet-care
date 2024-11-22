@@ -2,14 +2,19 @@ package com.microservice.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import com.microservice.MapperPet;
 import com.microservice.Pet;
 import com.microservice.PetDTO;
 import com.microservice.repository.PetRepository;
 
-
+@Service
 public class PetService implements InPetService {
-    PetRepository pr = new PetRepository();
+    @Autowired
+    PetRepository pr;
 
     @Override
     public void registerPet(PetDTO petDTO) {

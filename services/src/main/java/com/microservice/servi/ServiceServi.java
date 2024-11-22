@@ -2,6 +2,8 @@ package com.microservice.servi;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.microservice.Service;
 import com.microservice.ServiceDTO;
 import com.microservice.ServiceMapper;
@@ -12,7 +14,8 @@ import com.microservice.repository.ServiceRepository;
 
 @org.springframework.stereotype.Service
 public class ServiceServi implements IServiceServi {
-    ServiceRepository sr = new ServiceRepository();
+    @Autowired  
+    ServiceRepository sr;
 
     @Override
     public void registerService(Service service) {

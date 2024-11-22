@@ -8,13 +8,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.microservice.Providers;
 import com.microservice.RoleProvider;
 import com.microservice.database.Database;
 
 
-
+@Component
 public class ProviderRepository implements ProviderDAO {
+    @Autowired
     private Database db;
     private Connection connection;
 
@@ -28,7 +32,7 @@ public class ProviderRepository implements ProviderDAO {
     @Override
     public void registerProvider(Providers provider) {
         String query = "INSERT INTO providers(name, email, document, phoneNumber, gender, idCompany, rol,balance) VALUES(?,?,?,?,?,?,?,?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setString(1, provider.getName());
             pstmt.setString(2, provider.getEmail());
             pstmt.setLong(3, provider.getDocument());
@@ -47,7 +51,7 @@ public class ProviderRepository implements ProviderDAO {
     public List<Providers> getProviders() {
         List<Providers> providers = new ArrayList<>();
         String query = "SELECT name, email, document, phoneNumber, gender, idCompany, rol, balance FROM providers";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 Providers provider = new Providers(
@@ -71,7 +75,7 @@ public class ProviderRepository implements ProviderDAO {
     @Override
     public long getProviderById(long document) {
         String query = "SELECT idProvider FROM providers WHERE document = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setLong(1, document);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -86,7 +90,7 @@ public class ProviderRepository implements ProviderDAO {
     @Override
     public void updateProvider(Providers provider, long id) {
         String query = "UPDATE providers SET name = ?, email = ?, email = ?, phoneNumber = ?. gender = ?, idCompany = ?, rol = ? WHERE idProvider = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setString(1, provider.getName());
             pstmt.setString(2, provider.getEmail());
             pstmt.setLong(3, provider.getDocument());
@@ -104,7 +108,7 @@ public class ProviderRepository implements ProviderDAO {
     @Override
     public void deleteProvider(long id) {
         String query = "DELETE FROM providers WHERE idProvider = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -115,7 +119,7 @@ public class ProviderRepository implements ProviderDAO {
     @Override
     public void TopUpMoney(long id, float money) {
         String query = "UPDATE providers SET balance = ? WHERE idProvider = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setFloat(1, money);
             pstmt.setLong(2, id);
             pstmt.executeUpdate();

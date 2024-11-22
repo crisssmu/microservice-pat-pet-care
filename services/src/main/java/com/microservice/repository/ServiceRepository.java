@@ -8,6 +8,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.microservice.Service;
 import com.microservice.State;
 import com.microservice.database.Database;
@@ -15,10 +18,11 @@ import com.microservice.database.Database;
 
 
 
-
+@Component
 public class ServiceRepository implements ServiceDAO {
+    @Autowired
     private static Database db;
-    private Connection connection;
+
 
     public ServiceRepository() {
     }
@@ -31,7 +35,7 @@ public class ServiceRepository implements ServiceDAO {
     @Override
     public void registerService(Service service) {
         String query = "INSERT INTO services(dateservice, idpet, idtransaction, idtypeservice, state, idprovider, idcustomer, datecite, time) VALUES(?, ?, ?, ?, ?, ?, ?)";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)){
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)){
             pstmt.setDate(1, (Date)service.getDateService());
             pstmt.setLong(2, service.getIdPet());
             pstmt.setLong(3, service.getIdTransaction());
@@ -49,7 +53,7 @@ public class ServiceRepository implements ServiceDAO {
     public List<Service> getAllServices() {
         List<Service> services = new ArrayList<>();
         String query ="SELECT idpet, idcustomer, idprovider, idtypeservice, dateservice, idtransaction, state, datecite, time, state FROM services";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)){
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)){
             ResultSet rs = pstmt.executeQuery();
             while(rs.next()){
                 Service service = new Service();
@@ -74,7 +78,7 @@ public class ServiceRepository implements ServiceDAO {
     @Override
     public void updateServiceForTransaction(long id, long idTransaction) {
         String query = "UPDATE services idtransaction = ?  WHERE id = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)){
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)){
             pstmt.setLong(1, id);
             pstmt.setLong(2, idTransaction);
             pstmt.executeUpdate();
@@ -87,7 +91,7 @@ public class ServiceRepository implements ServiceDAO {
     @Override
     public void deleteService(long id) {
         String query = "DELETE FROM services WHERE id = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)){
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)){
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
         }catch(Exception e){
@@ -99,7 +103,7 @@ public class ServiceRepository implements ServiceDAO {
     @Override
     public long findServiceByStatePetType(Service service) {
         String query = "SELECT id FROM services WHERE state = ? AND idpet = ? AND idtypeservice = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)){
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)){
             pstmt.setString(1, service.getState().name());
             pstmt.setLong(2, service.getIdPet());
             pstmt.setLong(3, service.getIdTypeService());
@@ -116,7 +120,7 @@ public class ServiceRepository implements ServiceDAO {
     @Override
     public long findTransactionByService(long id) {
         String query = "SELECT idtransaction FROM services WHERE id = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)){
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)){
             pstmt.setLong(1, id);
             ResultSet rs = pstmt.executeQuery();
             while(rs.next()){
@@ -131,7 +135,7 @@ public class ServiceRepository implements ServiceDAO {
     @Override
     public void updateStateService(long id, State state) {
         String query = "UPDATE services SET state = ? WHERE id = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)){
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)){
             pstmt.setString(1, state.name());
             pstmt.setLong(2, id);
             pstmt.executeUpdate();

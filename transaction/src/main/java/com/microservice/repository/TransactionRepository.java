@@ -6,13 +6,17 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.microservice.Transaction;
 import com.microservice.database.Database;
 
 
+@Component
 public class TransactionRepository implements TransactionDAO {
+    @Autowired
 private final Database db;
-    private Connection connection;
 
 
 
@@ -24,7 +28,7 @@ private final Database db;
     @Override
     public void addTransaction(Transaction transaction) {
         String query = "INSERT INTO transactions(idCustomer, dateTranst, amount, idService) VALUES(?,?,?,?)";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setLong(1, transaction.getIdCustomer());
             pstmt.setDate(2, (Date) transaction.getDateTransaction());
             pstmt.setFloat(3, transaction.getAmount());
@@ -39,7 +43,7 @@ private final Database db;
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
         String query = "SELECT idCustomer, dateTranst, amount, idService FROM transactions";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.executeQuery();
             while(pstmt.getResultSet().next()) {
                 Transaction transaction = new Transaction();
@@ -58,7 +62,7 @@ private final Database db;
     @Override
     public long getTransactionId(long idCustomer, long idService) {
         String query = "SELECT idTransaction FROM transactions WHERE idCustomer = ? AND idService = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setLong(1, idCustomer);
             pstmt.setLong(2, idService);
             pstmt.executeQuery();
@@ -75,7 +79,7 @@ private final Database db;
     @Override
     public void payTransaction(long idTransaction, float amount) {
         String query = "UPDATE transactions SET amount = ? WHERE idTransaction = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try(PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setFloat(1, amount);
             pstmt.setLong(2, idTransaction);
             pstmt.executeUpdate();

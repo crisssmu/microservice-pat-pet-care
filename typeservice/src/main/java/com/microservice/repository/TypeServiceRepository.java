@@ -12,10 +12,11 @@ import com.microservice.TypeServiceFactory;
 import com.microservice.database.Database;
 
 
-
+@Component
 public class TypeServiceRepository implements TypeServiceDAO {
+    @Autowired
     private static Database db;
-    private Connection connection;
+
 
     public TypeServiceRepository() {
     }
@@ -26,7 +27,7 @@ public class TypeServiceRepository implements TypeServiceDAO {
 
     public void registerTypeService(TypeService typeService) {
         String query = "INSERT INTO typeServices(name, cost) VALUES(?,?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setString(1, typeService.getClass().getSimpleName());
             pstmt.setFloat(2, typeService.getCost());
             pstmt.executeUpdate();
@@ -39,7 +40,7 @@ public class TypeServiceRepository implements TypeServiceDAO {
     public List<TypeService> getAllTypeServices() {
         List<TypeService> typeServices = new ArrayList<>();
         String query = "SELECT name, cost FROM typeServices";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 String type = rs.getString("name");
@@ -57,7 +58,7 @@ public class TypeServiceRepository implements TypeServiceDAO {
     @Override
     public long getTypeServiceByCode(String name) {
         String query = "SELECT idTypeService FROM typeServices WHERE name = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -72,7 +73,7 @@ public class TypeServiceRepository implements TypeServiceDAO {
     @Override
     public void updateTypeService(TypeService typeService, long id) {
        String query = "UPDATE typeServices SET name = ?, cost = ? WHERE idTypeService = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setString(1, typeService.getClass().getSimpleName());
             pstmt.setFloat(2, typeService.getCost());
             pstmt.setLong(3, id);
@@ -85,7 +86,7 @@ public class TypeServiceRepository implements TypeServiceDAO {
     @Override
     public void deleteTypeService(long id) {
         String query = "DELETE FROM typeServices WHERE idTypeService = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try (PreparedStatement pstmt = Database.getInstance(db).prepareStatement(query)) {
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {

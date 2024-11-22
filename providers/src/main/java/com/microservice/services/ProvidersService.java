@@ -2,16 +2,20 @@ package com.microservice.services;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.microservice.ProviderDTO;
 import com.microservice.ProviderMapper;
 import com.microservice.Providers;
 import com.microservice.repository.ProviderRepository;
 
 
-
+@Service
 public class ProvidersService implements InProviderService {
 
-    ProviderRepository providerRepository = new ProviderRepository();
+    @Autowired
+    ProviderRepository providerRepository;
     @Override
     public void registerProvider(ProviderDTO providerDTO) {
         if(providerDTO != null){
